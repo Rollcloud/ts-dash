@@ -1,3 +1,5 @@
+#! .venv/bin/python3
+
 """
 Demo Flask application to test the operation of Flask with socket.io
 
