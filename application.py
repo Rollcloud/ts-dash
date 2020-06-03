@@ -17,15 +17,12 @@ Updated 13th April 2018
 
 """
 
-
-
-
 # Start with a basic flask app webpage.
-from flask_socketio import SocketIO, emit
-from flask import Flask, render_template, url_for, copy_current_request_context
+from flask_socketio import SocketIO
+from flask import Flask, render_template
+
 from random import random
-from time import sleep
-from threading import Thread, Event
+from threading import Event, Thread
 
 __author__ = 'slynn'
 
@@ -33,31 +30,33 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
 app.config['DEBUG'] = True
 
-#turn the flask app into a socketio app
+# turn the flask app into a socketio app
 socketio = SocketIO(app, async_mode=None, logger=True, engineio_logger=True)
 
-#random number Generator Thread
+# random number Generator Thread
 thread = Thread()
 thread_stop_event = Event()
 
-def randomNumberGenerator():
+
+def generate_numbers():
     """
     Generate a random number every 1 second and emit to a socketio instance (broadcast)
     Ideally to be run in a separate thread?
     """
-    #infinite loop of magical random numbers
+    # infinite loop of magical random numbers
     print("Making random numbers")
     while not thread_stop_event.isSet():
-        number = round(random()*10, 3)
+        number = round(random() * 10, 3)
         print(number)
         socketio.emit('newnumber', {'number': number}, namespace='/test')
-        socketio.sleep(5)
+        socketio.sleep(1)
 
 
 @app.route('/')
 def index():
-    #only by sending this page first will the client be connected to the socketio instance
+    # only by sending this page first will the client be connected to the socketio instance
     return render_template('index.html')
+
 
 @socketio.on('connect', namespace='/test')
 def test_connect():
@@ -65,10 +64,11 @@ def test_connect():
     global thread
     print('Client connected')
 
-    #Start the random number generator thread only if the thread has not been started before.
+    # Start the random number generator thread only if the thread has not been started before.
     if not thread.isAlive():
         print("Starting Thread")
-        thread = socketio.start_background_task(randomNumberGenerator)
+        thread = socketio.start_background_task(generate_numbers)
+
 
 @socketio.on('disconnect', namespace='/test')
 def test_disconnect():

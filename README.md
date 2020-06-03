@@ -6,7 +6,7 @@ Updated to Python 3: 19th-May-2018
 
 ===========
 
-Test of asynchronous flask communication with web page. 
+Test of asynchronous flask communication with web page.
 
 This repository is a sample flask application that updates a webpage using a background thread for all users connected.
 It is based on the very useful Flask-SocketIO code from Miguel Grinberg.
