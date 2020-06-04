@@ -17,13 +17,13 @@ Updated 13th April 2018
 
 """
 
-import raildriver
-
 from flask_socketio import SocketIO
 from flask import Flask, render_template
 
 from random import random
 from threading import Event, Thread
+
+from rwx_interface import rde
 
 __author__ = "rollcloud"
 
@@ -38,13 +38,8 @@ socketio = SocketIO(app, async_mode=None, logger=True, engineio_logger=True)
 thread = Thread()
 thread_stop_event = Event()
 
-# setup RailDriver
-rd = raildriver.RailDriver()
-rd.set_rail_driver_connected(True)  # start data exchange
-
-print(dict(rd.get_controller_list()).values())
-
 number = 42
+
 
 def generate_numbers():
     """
@@ -56,12 +51,21 @@ def generate_numbers():
     # infinite loop of magical random numbers
     print("Making random numbers")
     while not thread_stop_event.isSet():
-        try:
-            number = rd.get_current_controller_value("SpeedometerMPH")
-        except ValueError as err:
-            number += round(random() * 5-2.5, 0)
+        number += round(random() * 5 - 2.5, 0)
         socketio.emit("newnumber", {"number": number}, namespace="/test")
-        socketio.sleep(0.1)
+        socketio.sleep(0.3)
+
+
+def retrieve_parameters():
+    """
+    Query RailDriver.dll for the latest locomotive values.
+    Returns a dictionary
+    """
+
+    while not thread_stop_event.isSet():
+        params = rde.get_parameters()
+        socketio.emit("controls", params, namespace="/test")
+        socketio.sleep(0.3)
 
 
 @app.route("/")
@@ -79,7 +83,7 @@ def test_connect():
     # Start the random number generator thread only if the thread has not been started before.
     if not thread.isAlive():
         print("Starting Thread")
-        thread = socketio.start_background_task(generate_numbers)
+        thread = socketio.start_background_task(retrieve_parameters)
 
 
 @socketio.on("disconnect", namespace="/test")
