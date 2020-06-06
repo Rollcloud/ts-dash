@@ -1,0 +1,140 @@
+@import "fire.css";
+
+:root {
+    --steel-dark: url(/static/img/metall005-new-tileable.png);
+    --steel-light: url(/static/img/metall010-new-tileable.png);
+    --brass: url(/static/img/brass-tileable.jpg);
+    --paper: url(/static/img/paper-tileable.jpg);
+}
+
+.sp-control .embossed-heavy,
+.level {
+    border: 1px solid rgba(0, 0, 0, 0.25);
+    box-shadow: inset -1px 2px 3px rgba(255, 255, 255, 0.5),
+        inset 1px -2px 3px rgba(0, 0, 0, 0.5);
+}
+
+.sp-control .embossed-light,
+.level .glass,
+.panel {
+    border: 1px solid rgba(0, 0, 0, 0.125);
+    box-shadow: inset -1px 2px 3px rgba(255, 255, 255, 0.25),
+        inset 1px -2px 3px rgba(0, 0, 0, 0.25), -1px 2px 3px rgba(0, 0, 0, 0.18);
+}
+
+.sp-control .embossed-light-invert,
+.handle .gap {
+    border: 1px solid rgba(0, 0, 0, 0.18);
+    box-shadow: 1px -2px 3px rgba(255, 255, 255, 0.18),
+        -1px 2px 3px rgba(0, 0, 0, 0.18);
+}
+
+.sp-control {
+    padding: 10px;
+}
+
+.sp-control * {
+    transition: all 0.4s ease;
+}
+
+.handle {
+    position: relative;
+    height: var(--control-width-small);
+    width: calc(var(--control-width) / 2);
+}
+
+/* Handles */
+.handle .panel {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: #2f2928;
+    background-image: var(--steel-light);
+    filter: brightness(85%);
+    border-radius: 5px;
+}
+
+.handle .gap {
+    position: absolute;
+    background-color: rgba(0, 0, 0, 0.5);
+    width: 10%;
+    height: calc(100% - 20px);
+    left: 50%;
+    transform: translate(-50%, 0);
+    border-radius: 4px;
+}
+
+.handle .grip {
+    position: absolute;
+    bottom: 50%;
+    background-color: lightgrey;
+    width: 55%;
+    height: 10%;
+    left: 50%;
+    transform: translate(-50%, 0);
+    border-radius: 4px;
+    box-shadow: -3px 6px 10px 0px #000000ff,
+        inset 3px -6px 8px 0px rgba(0, 0, 0, 0.57);
+    cursor: not-allowed;
+}
+
+/* Levels */
+.level {
+    background-image: var(--brass);
+    background-size: 100%;
+    position: relative;
+    width: 32px;
+    height: var(--control-width-small);
+    border-radius: 10px;
+    filter: brightness(0.9);
+}
+.level .backing {
+    background-image: var(--paper);
+    background-size: 200%;
+    position: absolute;
+    top: 10px;
+    bottom: 10px;
+    left: 10px;
+    right: 10px;
+    border-radius: 6px;
+}
+.level .contents {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    background-color: red;
+}
+.level.oil .contents {
+    background-color: #333;
+}
+.level.water .contents {
+    background-color: cornflowerblue;
+    background: repeating-linear-gradient(
+        45deg,
+        powderblue,
+        powderblue 7px,
+        cornflowerblue 7px,
+        cornflowerblue 14px
+    );
+}
+.level.water .backing:before {
+    content: "";
+    background: repeating-linear-gradient(
+        -45deg,
+        transparent,
+        transparent 7px,
+        #aaa 7px,
+        #aaa 14px
+    );
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+.level .glass {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(200, 200, 200, 0.2);
+}
