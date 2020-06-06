@@ -23,7 +23,7 @@ from flask import Flask, render_template
 from random import random
 from threading import Event, Thread
 
-from rwx_interface import rde
+from rwx_interface import RailDriverExtended
 
 __author__ = "rollcloud"
 
@@ -34,38 +34,79 @@ app.config["DEBUG"] = True
 # turn the flask app into a socketio app
 socketio = SocketIO(app, async_mode=None, logger=True, engineio_logger=True)
 
-# random number Generator Thread
-thread = Thread()
-thread_stop_event = Event()
+# empty dict for storing data over the lifetime of the program
+app_data = {}
 
-number = 42
+# create threads
+param_thread = Thread()
+param_thread_stop_event = Event()
+
+loco_thread = Thread()
+loco_thread_stop_event = Event()
 
 
-def generate_numbers():
+def get_rde():
+    global app_data
+
+    if 'rde' not in app_data:
+        for k in app_data:
+            print(k)
+        print("Starting RDE...")
+        app_data['rde'] = RailDriverExtended()
+        app_data['rde'].set_rail_driver_connected(True)  # start data exchange
+        print(app_data['rde'])
+
+    return app_data['rde']
+
+
+@app.teardown_appcontext
+def teardown_rde(*args):
+    global app_data
+
+    rde = app_data.pop('rde', None)
+
+    if rde is not None:
+        print("Closing RDE...")
+        rde.unload()
+
+
+def check_loco():
     """
-    Generate a random number every 1 second and emit to a socketio instance (broadcast)
-    Ideally to be run in a separate thread?
+    Query RailDriverExtended for the latest locomotive.
     """
-    global number
+    prev_loco_name = None
+    while not loco_thread_stop_event.isSet():
+        rde = get_rde()
 
-    # infinite loop of magical random numbers
-    print("Making random numbers")
-    while not thread_stop_event.isSet():
-        number += round(random() * 5 - 2.5, 0)
-        socketio.emit("newnumber", {"number": number}, namespace="/test")
-        socketio.sleep(0.3)
+        loco_name = rde.get_loco_name()
+
+        if loco_name != prev_loco_name:
+            rde.load_controllers()
+
+        # send locomotive name
+        socketio.emit(
+            "loco",
+            {'loco_name': loco_name, 'loco_type': rde.get_loco_type()},
+            namespace="/test",
+        )
+
+        prev_loco_name = loco_name
+        socketio.sleep(5)
 
 
 def retrieve_parameters():
     """
-    Query RailDriver.dll for the latest locomotive values.
+    Query RailDriverExtended for the latest locomotive values.
     Returns a dictionary
     """
+    # rde = get_rde()
 
-    while not thread_stop_event.isSet():
+    while not param_thread_stop_event.isSet():
+        rde = get_rde()
+
         params = rde.get_parameters()
         socketio.emit("controls", params, namespace="/test")
-        socketio.sleep(0.3)
+        socketio.sleep(0.4)
 
 
 @app.route("/")
@@ -77,13 +118,17 @@ def index():
 @socketio.on("connect", namespace="/test")
 def test_connect():
     # need visibility of the global thread object
-    global thread
+    global loco_thread, param_thread
     print("Client connected")
 
-    # Start the random number generator thread only if the thread has not been started before.
-    if not thread.isAlive():
-        print("Starting Thread")
-        thread = socketio.start_background_task(retrieve_parameters)
+    # Start the threads thread only if the thread has not been started before.
+    if not loco_thread.isAlive():
+        print("Starting Loco Thread")
+        loco_thread = socketio.start_background_task(check_loco)
+
+    if not param_thread.isAlive():
+        print("Starting Param Thread")
+        param_thread = socketio.start_background_task(retrieve_parameters)
 
 
 @socketio.on("disconnect", namespace="/test")

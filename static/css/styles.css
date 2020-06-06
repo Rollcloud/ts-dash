@@ -1,0 +1,200 @@
+:root {
+    --control-width: 200px;
+    --control-width-small: 150px;
+}
+
+body {
+    background-color: #2f2928;
+    color: #ddd;
+    font-family: "Abhaya Libre", serif;
+}
+
+section {
+    background-image: url(/static/img/metall005-new-tileable.png);
+    padding: 1rem 2rem;
+}
+
+h1 {
+    color: #decd54;
+    font-weight: bold;
+}
+
+.minitron {
+    background-color: #4b4f51;
+    background-image: url(/static/img/metall010-new-tileable.png);
+}
+
+.row {
+    padding: 0.5rem 0;
+}
+
+.embossed-light {
+    border: 1px solid rgba(0, 0, 0, 0.125);
+    box-shadow: inset -1px 2px 3px rgba(255, 255, 255, 0.25),
+        inset 1px -2px 3px rgba(0, 0, 0, 0.25);
+}
+
+.embossed-light-invert {
+    border: 1px solid rgba(0, 0, 0, 0.18);
+    box-shadow: 1px -2px 3px rgba(255, 255, 255, 0.18),
+        -1px 2px 3px rgba(0, 0, 0, 0.18);
+}
+
+/* Gauges */
+/* Outer-ring */
+.g-gauge circle:nth-child(1) {
+    fill: #ab902f;
+}
+
+/* Main background */
+/*.g-gauge circle:nth-child(2) {
+    fill: black;
+    stroke: #ddd;
+    stroke-width: 5;
+}
+*/
+
+/* Circle of the pointer */
+/*.g-gauge circle:nth-child(3) {
+    fill: pink;
+    stroke: white;
+    stroke-width: 6px;
+}*/
+
+/* All gauge text */
+.g-gauge text {
+    font-family: "Abhaya Libre", serif;
+}
+
+/* Main text of the gauge */
+.g-gauge svg > g > text:first-of-type {
+    /*font-size: 15px;*/
+    transform: translate(0, 25%);
+}
+
+.g-gauge svg > g > text:not(:first-of-type) {
+    font-size: 14px;
+    font-weight: bold;
+}
+
+/* Ticks */
+/*.g-gauge path {
+    stroke: white;
+}*/
+
+/* Circle */
+/*.g-gauge path:nth-child(2) {
+    fill: #fc6c05;
+    stroke: white;
+    stroke-width: 2px;
+    fill-opacity: 1;
+}*/
+
+/* Warning area */
+/*.g-gauge path:nth-child(3) {
+    fill: lightyellow;
+}*/
+
+/* Danger area */
+/*.g-gauge path:nth-child(4) {
+    fill: darkgreen;
+}*/
+
+/* Firebox */
+
+.firebox {
+    width: 100%;
+    min-width: calc(var(--control-width-small) * 2);
+    position: relative;
+    padding: 5%;
+}
+
+.inside {
+    overflow-y: hidden;
+    border-radius: 100%;
+    height: var(--control-width-small);
+    width: var(--control-width-small);
+    margin: 0 auto;
+    position: relative;
+
+    animation-name: flickerInside;
+    animation-duration: 1200ms;
+    animation-delay: 200ms;
+    animation-timing-function: ease-in-out;
+    animation-iteration-count: infinite;
+
+    background-color: orange;
+}
+
+@keyframes flickerInside {
+    0% {
+        background-color: #fc6400;
+    }
+    20% {
+        background-color: #801100;
+    }
+    40% {
+        background-color: #d73502;
+    }
+    60% {
+        background-color: #fc6400;
+    }
+    80% {
+        background-color: #b62203;
+    }
+    100% {
+        background-color: #ff7500;
+    }
+}
+
+/* firebox back */
+.inside::before {
+    background-color: black;
+    height: 100%;
+    width: 100%;
+    content: " ";
+    position: absolute;
+    opacity: 0.6;
+}
+
+.doors {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    top: 0;
+    left: 0;
+}
+
+.door {
+    background-color: #2f2928;
+    background-image: url(/static/img/metall010-new-tileable.png);
+    filter: brightness(85%);
+    border-radius: 5px;
+
+    border: 1px solid rgba(0, 0, 0, 0.125);
+    box-shadow: inset -1px 2px 3px rgba(255, 255, 255, 0.25),
+        inset 1px -2px 3px rgba(0, 0, 0, 0.25), -2px 4px 6px rgba(0, 0, 0, 0.25);
+
+    width: calc(var(--control-width-small) * 2 / 3);
+    height: 100%;
+    position: absolute;
+    transition: all 0.5s ease;
+}
+
+.doors .left {
+    background-position: 65% 12%;
+    right: 0;
+    margin-right: 50%;
+}
+.doors .right {
+    background-position: 12% 65%;
+    left: 0;
+    margin-left: 50%;
+}
+
+.doors.open .left {
+    margin-right: calc(50% + var(--control-width-small) / 2 - 2%);
+}
+.doors.open .right {
+    margin-left: calc(50% + var(--control-width-small) / 2 - 2%);
+}
