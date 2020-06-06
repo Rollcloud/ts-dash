@@ -9,6 +9,7 @@ verify_ssl = true
 flask-socketio = "*"
 Flask = "*"
 py-raildriver = "*"
+eventlet = "*"
 
 [requires]
 python_version = "3.6"
