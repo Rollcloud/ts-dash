@@ -60,7 +60,7 @@
     position: absolute;
     background-color: rgba(0, 0, 0, 0.5);
     width: 10%;
-    height: calc(100% - 20px);
+    height: calc(100% - 20px - 2rem);
     left: 50%;
     transform: translate(-50%, 0);
     border-radius: 4px;
@@ -78,6 +78,7 @@
     box-shadow: -3px 6px 10px 0px #000000ff,
         inset 3px -6px 8px 0px rgba(0, 0, 0, 0.57);
     cursor: not-allowed;
+    margin-bottom: 2rem;
 }
 
 /* Levels */
