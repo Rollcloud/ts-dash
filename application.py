@@ -49,25 +49,12 @@ def get_rde():
     global app_data
 
     if 'rde' not in app_data:
-        for k in app_data:
-            print(k)
         print("Starting RDE...")
         app_data['rde'] = RailDriverExtended()
         app_data['rde'].set_rail_driver_connected(True)  # start data exchange
         print(app_data['rde'])
 
     return app_data['rde']
-
-
-@app.teardown_appcontext
-def teardown_rde(*args):
-    global app_data
-
-    rde = app_data.pop('rde', None)
-
-    if rde is not None:
-        print("Closing RDE...")
-        rde.unload()
 
 
 def check_loco():
@@ -99,14 +86,14 @@ def retrieve_parameters():
     Query RailDriverExtended for the latest locomotive values.
     Returns a dictionary
     """
-    # rde = get_rde()
-
     while not param_thread_stop_event.isSet():
-        rde = get_rde()
 
-        params = rde.get_parameters()
-        socketio.emit("controls", params, namespace="/test")
-        socketio.sleep(0.4)
+        if app_data['loco_name'] is not None:
+            rde = get_rde()
+            params = rde.get_parameters()
+            socketio.emit("controls", params, namespace="/test")
+
+        socketio.sleep(0.05)
 
 
 @app.route("/")
