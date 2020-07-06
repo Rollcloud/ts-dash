@@ -35,7 +35,7 @@ app.config["DEBUG"] = True
 socketio = SocketIO(app, async_mode=None, logger=True, engineio_logger=True)
 
 # empty dict for storing data over the lifetime of the program
-app_data = {}
+app_data = {'loco_name': None}
 
 # create threads
 param_thread = Thread()
@@ -61,13 +61,15 @@ def check_loco():
     """
     Query RailDriverExtended for the latest locomotive.
     """
-    prev_loco_name = None
     while not loco_thread_stop_event.isSet():
         rde = get_rde()
 
         loco_name = rde.get_loco_name()
 
-        if loco_name != prev_loco_name:
+        if loco_name != app_data['loco_name']:
+            # save new name
+            app_data['loco_name'] = loco_name
+            # retrieve new controllers
             rde.load_controllers()
 
         # send locomotive name
@@ -77,7 +79,6 @@ def check_loco():
             namespace="/test",
         )
 
-        prev_loco_name = loco_name
         socketio.sleep(5)
 
 
