@@ -119,6 +119,14 @@ def test_connect():
         param_thread = socketio.start_background_task(retrieve_parameters)
 
 
+@socketio.on("command", namespace='/test')
+def handle_command(msg):
+    # print('received msg:', msg)
+    rde = get_rde()
+    for controller, value in msg.items():
+        rde.set_parameter(controller, value)
+
+
 @socketio.on("disconnect", namespace="/test")
 def test_disconnect():
     print("Client disconnected")

@@ -2,6 +2,7 @@ google.charts.load("current", { packages: ["gauge"] });
 google.charts.setOnLoadCallback(main);
 
 var controls;
+var socket;
 
 class Gauge {
     constructor(element_id, label, options) {
@@ -61,20 +62,67 @@ function createControls() {
             majorTicks: [20, 60, 100, 140, 180, 220, 260],
             minorTicks: 4,
         }),
-        regulator: new Handle("#handle-regulator", "Throttle", {
-            zero: "bot",
-            colour: "#e45f54", // red
-        }),
-        reverser: new Handle("#handle-reverser", "Reverse", {
-            zero: "mid",
-            colour: "#4684ee", // blue
-        }),
-        "water-boiler": new Level("#level-boiler", "Boiler %", {
+        horn: new Handle(
+            "#handle-horn",
+            ["Horn"],
+            "Horn",
+            {
+                zero: "bot",
+            },
+            function (value) {
+                console.log("Send horn: ", value);
+                socket.emit("command", { Horn: value });
+            }
+        ),
+        regulator: new Handle(
+            "#handle-regulator",
+            ["Regulator", "VirtualThrottle"],
+            "Throttle",
+            {
+                zero: "bot",
+                colour: "#e45f54", // red
+            },
+            function (value) {
+                console.log("Send throttle: ", value);
+                socket.emit("command", { Regulator: value });
+            }
+        ),
+        reverser: new Handle(
+            "#handle-reverser",
+            ["Reverser"],
+            "Reverse",
+            {
+                zero: "mid",
+                colour: "#4684ee", // blue
+            },
+            function (value) {
+                console.log("Send reverse: ", value);
+                socket.emit("command", { Reverser: value });
+            }
+        ),
+        "train-brake": new Handle(
+            "#handle-train-brake",
+            ["TrainBrakeControl"],
+            "Train Brake",
+            {
+                zero: "bot",
+                colour: "#666", // black
+            },
+            function (value) {
+                console.log("Send brake: ", value);
+                socket.emit("command", { TrainBrakeControl: value });
+            }
+        ),
+        "water-boiler": new Level("#level-boiler", "", "Boiler %", {
             contents: "water",
         }),
-        "water-tank": new Level("#level-tank", "Tank %", { contents: "water" }),
-        "coal-fire": new Level("#level-fire", "Fire %", { contents: "oil" }),
-        "coal-bunker": new Level("#level-bunker", "Bunker %", {
+        "water-tank": new Level("#level-tank", "", "Tank %", {
+            contents: "water",
+        }),
+        "coal-fire": new Level("#level-fire", "", "Fire %", {
+            contents: "oil",
+        }),
+        "coal-bunker": new Level("#level-bunker", "", "Bunker %", {
             contents: "oil",
         }),
     };
@@ -92,7 +140,7 @@ function main() {
     controls = createControls();
 
     //connect to the socket server.
-    var socket = io.connect(
+    socket = io.connect(
         "http://" + document.domain + ":" + location.port + "/test"
     );
 
@@ -115,8 +163,11 @@ function main() {
         controls["steam-chest"].update(msg.steamchestpressuregaugepsi);
 
         // update handles
+        controls["horn"].update(msg.horn);
+
         controls["regulator"].update(msg.regulator);
         controls["reverser"].update(msg.reverser);
+        controls["train-brake"].update(msg.trainbrakecontrol);
 
         // update levels
         controls["water-boiler"].update(msg.watergauge);

@@ -13,10 +13,13 @@ class RailDriverExtended(raildriver.RailDriver):
     KEYS_BOTH = [
         'HandBrake',
         'Handbrake',
+        'VirtualThrottle',
         'Regulator',
         'Reverser',
         'SpeedometerMPH',
         'SpeedometerKPH',
+        'TrainBrakeControl',
+        'Horn',
     ]
     KEYS_STEAM = [
         'BoilerPressureGaugePSI',
@@ -83,6 +86,13 @@ class RailDriverExtended(raildriver.RailDriver):
             return TYPE_STEAM
         else:
             return TYPE_NONE
+
+    def set_parameter(self, name, value):
+        try:
+            print(name, self.controllers[name], value)
+            self.set_controller_value(self.controllers[name], value)
+        except KeyError as err:  # controller not used in currently selected loco
+            print(f"Invalid control '{name}' for '{self.get_loco_name()}'")
 
 
 # # setup RailDriver
