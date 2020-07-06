@@ -32,7 +32,7 @@ app.config["SECRET_KEY"] = "An actually secret key! Nah, who am I kidding :P"
 app.config["DEBUG"] = True
 
 # turn the flask app into a socketio app
-socketio = SocketIO(app, async_mode=None, logger=True, engineio_logger=True)
+socketio = SocketIO(app, async_mode=None, logger=False, engineio_logger=True)
 
 # empty dict for storing data over the lifetime of the program
 app_data = {'loco_name': None}
@@ -133,4 +133,4 @@ def test_disconnect():
 
 
 if __name__ == "__main__":
-    socketio.run(app)
+    socketio.run(app, host="0.0.0.0", port="5000")
