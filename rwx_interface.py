@@ -19,12 +19,13 @@ class RailDriverExtended(raildriver.RailDriver):
         'SpeedometerMPH',
         'SpeedometerKPH',
         'TrainBrakeControl',
+        'MainReservoirPressureINCHES',
+        'VacuumBrakePipePressureINCHES',
         'Horn',
     ]
     KEYS_STEAM = [
         'BoilerPressureGaugePSI',
         'SteamChestPressureGaugePSI',
-        'MainReservoirPressureINCHES',
         'WaterGauge',
         'FireboxDoor',
     ]
@@ -48,7 +49,7 @@ class RailDriverExtended(raildriver.RailDriver):
 
     def load_controllers(self):
         self.controllers = {name: index for index, name in self.get_controller_list()}
-        print(self.controllers)
+        print(f"Controllers: {self.controllers}")
 
     def get_parameters(self):
         params = {}
